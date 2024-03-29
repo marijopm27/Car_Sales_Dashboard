@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 
-st.set_page_config(page_title="Car Sales", layout="wide")
+st.set_page_config(page_title="Car Sales",page_icon="chart_with_upwards_trend", layout="wide")
 df = pd.read_csv('CarSales.csv')
 
 # Convertir la columna 'Date' al formato de fecha adecuado

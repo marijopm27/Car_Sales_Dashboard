@@ -11,4 +11,6 @@ El panel proporciona una interfaz de usuario para explorar datos de ventas de au
 
 ## Ejemplos de Uso
 
-
+<p align="left">
+  <img src="Example.gif" alt="Uso GIF">
+</p>
