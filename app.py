@@ -1,23 +1,16 @@
 import pandas as pd
 import streamlit as st
 
-
-
 st.set_page_config(page_title="Car Sales", layout="wide")
 df = pd.read_csv('CarSales.csv')
 
-# Utilizacion de estilos 
-# def local_css(file_name):
-#     with open(file_name) as f:
-#         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
-
-# local_css("style.css")
-#st.dataframe(df,height=1500)
+# Convertir la columna 'Date' al formato de fecha adecuado
+df['Date'] = pd.to_datetime(df['Date'], format='%m/%d/%Y').dt.date
 
 # ------------------------- SIDEBAR FILTERS -------------------------------------
-#Creacion del SideBar de la aplicacion de Streamlit
+# Creacion del SideBar de la aplicacion de Streamlit
 
-#Esta seccion tendra los filtros a aplicar sobre el dataset de base
+# Esta seccion tendra los filtros a aplicar sobre el dataset de base
 
 st.header("Car Sales Dashboard")
 
@@ -27,24 +20,21 @@ gender = st.sidebar.multiselect(
     options=df["Gender"].unique(),
     default=df["Gender"].unique()
 )
+# Obtener las fechas únicas y ordenarlas
+dates = sorted(df['Date'].unique())
 
+# Agregar filtro de rango de fechas con slider
+selected_dates = st.sidebar.slider(
+    "Seleccione un rango de fechas:",
+    min_value=dates[0],
+    max_value=dates[-1],
+    value=(dates[0], dates[-1])
+)
 company = st.sidebar.multiselect(
     "Seleccione la compañía:",
     options=df["Company"].unique(),
     default=df["Company"].unique()
 )
-
-# model = st.sidebar.multiselect(
-#     "Seleccione el modelo:",
-#     options=df["Model"].unique(),
-#     default=df["Model"].unique()
-# )
-
-# engine = st.sidebar.multiselect(
-#     "Seleccione el engine:",
-#     options=df["Engine"].unique(),
-#     default=df["Engine"].unique()
-# )
 
 transmision = st.sidebar.multiselect(
     "Seleccione el tipo de transmision:",
@@ -63,9 +53,23 @@ bodystyle = st.sidebar.multiselect(
     default=df["BodyStyle"].unique()
 )
 
+# Filtrar el DataFrame según las selecciones del usuario
 df_filtered = df.query(
-    "Gender == @gender and Company == @company and  Transmission == @transmision and Color == @color and BodyStyle == @bodystyle"
+    "Gender == @gender and Company == @company and  Transmission == @transmision and Color == @color and BodyStyle == @bodystyle and Date >= @selected_dates[0] and Date <= @selected_dates[1]"
 )
+
+# Obtener los modelos disponibles basados en las compañías seleccionadas
+available_models = df_filtered[df_filtered['Company'].isin(company)]['Model'].unique()
+
+# Permitir al usuario seleccionar modelos basados en las compañías filtradas
+selected_models = st.sidebar.multiselect(
+    "Seleccione el modelo:",
+    options=available_models,
+    default=available_models
+)
+
+# Aplicar el filtro de modelos seleccionados
+df_filtered = df_filtered[df_filtered['Model'].isin(selected_models)]
 
 st.dataframe(df_filtered)
 
@@ -75,7 +79,6 @@ st.dataframe(df_filtered)
 st.subheader("Gráfico de Ventas por Compañía")
 sales_by_company = df_filtered['Company'].value_counts()
 st.bar_chart(sales_by_company)
-
 
 # Gráfico de ventas por modelo
 st.subheader("Gráfico de Ventas por Modelo")
