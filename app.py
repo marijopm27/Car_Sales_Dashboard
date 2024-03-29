@@ -1,8 +1,17 @@
 import pandas as pd
 import streamlit as st
 
+
+
 st.set_page_config(page_title="Car Sales", layout="wide")
 df = pd.read_csv('CarSales.csv')
+
+# Utilizacion de estilos 
+# def local_css(file_name):
+#     with open(file_name) as f:
+#         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+
+# local_css("style.css")
 #st.dataframe(df,height=1500)
 
 # ------------------------- SIDEBAR FILTERS -------------------------------------
@@ -31,17 +40,17 @@ company = st.sidebar.multiselect(
 #     default=df["Model"].unique()
 # )
 
-engine = st.sidebar.multiselect(
-    "Seleccione el engine:",
-    options=df["Engine"].unique(),
-    default=df["Engine"].unique()
-)
-
-# transmision = st.sidebar.multiselect(
-#     "Seleccione el tipo de transmision:",
-#     options=df["Transmission"].unique(),
-#     default=df["Transmission"].unique()
+# engine = st.sidebar.multiselect(
+#     "Seleccione el engine:",
+#     options=df["Engine"].unique(),
+#     default=df["Engine"].unique()
 # )
+
+transmision = st.sidebar.multiselect(
+    "Seleccione el tipo de transmision:",
+    options=df["Transmission"].unique(),
+    default=df["Transmission"].unique()
+)
 color = st.sidebar.multiselect(
     "Seleccione el color del vehículo:",
     options=df["Color"].unique(),
@@ -55,7 +64,7 @@ bodystyle = st.sidebar.multiselect(
 )
 
 df_filtered = df.query(
-    "Gender == @gender and Company == @company and  Engine == @engine and Color == @color and BodyStyle == @bodystyle"
+    "Gender == @gender and Company == @company and  Transmission == @transmision and Color == @color and BodyStyle == @bodystyle"
 )
 
 st.dataframe(df_filtered)
@@ -63,21 +72,22 @@ st.dataframe(df_filtered)
 # ------------------------- MAIN PAGE -------------------------------------
 
 # Gráfico de ventas por compañía
-st.header("Gráfico de Ventas por Compañía")
+st.subheader("Gráfico de Ventas por Compañía")
 sales_by_company = df_filtered['Company'].value_counts()
 st.bar_chart(sales_by_company)
 
+
 # Gráfico de ventas por modelo
-st.header("Gráfico de Ventas por Modelo")
+st.subheader("Gráfico de Ventas por Modelo")
 sales_by_model = df_filtered['Model'].value_counts()
 st.bar_chart(sales_by_model)
 
 # Gráfico de ventas por región del distribuidor
-st.header("Gráfico de Ventas por Región del Distribuidor")
+st.subheader("Gráfico de Ventas por Región del Distribuidor")
 sales_by_region = df_filtered['Dealer_Region'].value_counts()
 st.bar_chart(sales_by_region)
 
 # Calcular suma de montos totales por compañía
-st.header("Suma de Montos Totales por Compañía")
+st.subheader("Suma de Montos Totales por Compañía")
 total_sales_by_company = df_filtered.groupby('Company')['Price ($)'].sum()
 st.bar_chart(total_sales_by_company)
